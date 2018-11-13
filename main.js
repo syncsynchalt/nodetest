@@ -3,7 +3,6 @@
 let http = require('http');
 let url = require('url');
 let querystring = require('querystring');
-let util = require('util'); // xxx remove
 let dispatcher = require(__dirname + '/dispatcher.js');
 
 const POST_LIMIT_BYTES = 1000000;
@@ -15,7 +14,7 @@ function abortRequest(request, response, code, msg) {
 }
 
 async function parsePostParams(request, response) {
-	return new Promise((resolve, reject) => {
+	return new Promise((resolve, _reject) => {
 		let queryData = '';
 		request.on('data', function(data) {
 			queryData += data;
@@ -30,12 +29,12 @@ async function parsePostParams(request, response) {
 	});
 }
 
-function parseGetParams(request, response) {
+function parseGetParams(request, _reject) {
 	let u = url.parse(request.url, true);
 	return u.query;
 }
 
-let server = http.createServer(async (request, response) => {
+http.createServer(async (request, response) => {
 	let params;
 	if (request.method === 'POST') {
 		params = await parsePostParams(request, response);
@@ -48,4 +47,4 @@ let server = http.createServer(async (request, response) => {
 	return dispatcher.dispatch(request, response, params);
 }).listen(8082);
 
-console.log("Listening on http://localhost:8082/");
+console.log('Listening on http://localhost:8082/');

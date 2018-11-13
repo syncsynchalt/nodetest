@@ -1,6 +1,5 @@
 let url = require('url');
 let fs = require('fs');
-let util = require('util');
 
 function sanitizePath(path) {
 	// TODO - this is rough sanitization, not correct against proper use
@@ -21,9 +20,14 @@ function sanitizePath(path) {
 	return path;
 }
 
-exports.serve = function serveStatic(request, response, params) {
-	let u = url.parse(request.url);
-	let path = sanitizePath(u.pathname);
+exports.serve = function serveStatic(request, response, _params) {
+	let path;
+	if (typeof request === 'string') {
+		path = request;
+	} else {
+		let u = url.parse(request.url);
+		path = sanitizePath(u.pathname);
+	}
 	if (path === '/') {
 		path = '/index.html';
 	}
