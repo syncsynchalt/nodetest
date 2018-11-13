@@ -1,0 +1,16 @@
+{
+  "name": "testnode",
+  "version": "1.0.0",
+  "description": "Learning node.js",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/syncsynchalt/nodetest"
+  },
+  "author": "Michael Driscoll",
+  "license": "ISC"
+}

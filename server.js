@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 
-process.on('uncaughtException', (err) => {
-	console.log('Uncaught exception: ' + err);
-	process.exit(1);
-})
-
 let http = require('http');
 let url = require('url');
 let querystring = require('querystring');
 let util = require('util'); // xxx remove
+let dispatcher = require(__dirname + '/dispatcher.js');
 
 const POST_LIMIT_BYTES = 1000000;
 
@@ -49,22 +45,7 @@ let server = http.createServer(async (request, response) => {
 		return abortRequest(request, response, 500, 'HTTP method not handled');
 	}
 
-	let u = url.parse(request.url);
-console.log('---------');
-// console.log('url:' + util.inspect(u));
-console.log('path:' + u.path);
-console.log('params:' + util.inspect(params));
-
-	if (u.pathname === '/login') {
-		if (request.method !== 'POST') {
-			return abortRequest(request, response, 403, 'login must be a POST');
-		}
-		response.writeHead(200, {'Content-Type': 'text/plain'});
-		response.end('Hello World\n');
-	} else {
-		response.writeHead(200, {'Content-Type': 'text/plain'});
-		response.end('Hello World\n');
-	}
+	return dispatcher.dispatch(request, response, params);
 }).listen(8082);
 
 console.log("Listening on http://localhost:8082/");
