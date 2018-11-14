@@ -30,6 +30,7 @@
 	<p class="text-danger" id="errorMsg"></p>
 </div>
 <script>
+// small enough that we just embed it in the HTML
 function loadConfig() {
 	let conf = document.getElementById('config');
 	let key = document.getElementById('name').value;
@@ -44,7 +45,6 @@ function loadConfig() {
 	xhr.send();
 }
 function callUpdate() {
-	// small enough that we just embed it in the HTML
 	let successMsg = document.getElementById('successMsg');
 	let errorMsg = document.getElementById('errorMsg');
 	let conf = document.getElementById('config').value;

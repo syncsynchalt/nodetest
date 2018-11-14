@@ -9,7 +9,7 @@ const API_REGEX = new RegExp('^/api/([a-z]+)/.*$');
 
 exports.dispatch = async (request, response) => {
 	let u = url.parse(request.url);
-	console.log(`Dispatching ${u.pathname}`);
+	console.log(`Dispatching ${request.method} ${u.pathname}`);
 
 	if (!SAFE_PAGES.includes(u.pathname) && !auth.isLoggedIn(request)) {
 		// redirect unauthed users to static/login.html

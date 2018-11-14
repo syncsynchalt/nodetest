@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<style>
+		.container {
+			margin-top: 1em;
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<p>Creates random test data.
+
+	<div class="form-group">
+		<label for="name">Number of records</label>
+		<input type="number" id="amount" value=100></input>
+	</div>
+
+	<button class="btn btn-primary" onclick="callGenerate()">Generate</button>
+	<p class="text-success" id="successMsg"></p>
+	<p class="text-danger" id="errorMsg"></p>
+</div>
+<script>
+// small enough that we just embed it in the HTML
+
+function generateRandString(chars) {
+	let c = 'abcdefghijklmnopqrstuvwxyz';
+	let result = '';
+	for (let i = 0; i < chars; i++) {
+		result += c.charAt(Math.floor(Math.random() * c.length));
+	}
+	return result;
+}
+
+function callGenerate() {
+	let successMsg = document.getElementById('successMsg');
+	let errorMsg = document.getElementById('errorMsg');
+	let num = document.getElementById('amount').value;
+
+	function create(i, limit) {
+		if (i >= limit) {
+			return;
+		}
+		let xhr = new XMLHttpRequest();
+		xhr.onload = () => {
+			if (xhr.status != 200) {
+				errorMsg.textContent = 'Request failed: ' + xhr.responseText;
+				successMsg.textContent = '';
+				return;
+			} else {
+				errorMsg.textContent = '';
+				successMsg.textContent = `Created ${i+1} documents`;
+				return create(++i, limit);
+			}
+		}
+		xhr.open('POST', '/api/configs/');
+		xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+		let doc = {
+			name: 'random_' + generateRandString(10),
+			hostname: generateRandString(5) + '.lab.example.org',
+			port: Math.ceil(Math.random() * 32000),
+			username: generateRandString(10)
+		};
+		xhr.send(JSON.stringify(doc));
+	}
+	create(0, num);
+}
+</script>
+</body>

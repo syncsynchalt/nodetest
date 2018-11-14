@@ -24,14 +24,14 @@
 	<div class="form-group">
 		<label for="sortKey">Sort key</label>
 		<input type="text" id="sortKey" name="sortKey" placeholder="optional"></input>
-    </div>
+	</div>
 	<button class="btn btn-primary" onclick="callList()">List</button>
 
 	<p class="text-danger" id="errorMsg"></p>
 </div>
 <script>
+// small enough that we just embed it in the HTML
 function callList() {
-	// small enough that we just embed it in the HTML
 	let errorMsg = document.getElementById('errorMsg');
 	let listing = document.getElementById('listing');
 	let sortKey = document.getElementById('sortKey').value;
