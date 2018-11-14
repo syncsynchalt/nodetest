@@ -74,7 +74,7 @@ exports.handleAPI = async (request, response) => {
 				writejson.write({success: true, configuration: JSON.parse(data)}, response);
 			});
 		} else {
-			writejson.write({success: false}, response, 404);
+			writejson.write({success: false}, response, 204);
 		}
 	} else if (request.method === 'POST' && u.pathname === '/api/configs/') {
 		// create a config
@@ -108,7 +108,7 @@ exports.handleAPI = async (request, response) => {
 			}
 			if (!configExists(config.name)) {
 				// known issue: race condition here
-				return errors.abortRequest(request, response, 404, 'Does not exist');
+				return errors.abortRequest(request, response, 204, 'Does not exist');
 			}
 			let file = getConfigFilename(config.name);
 			fs.writeFile(file, data, 'utf8', (err) => {
@@ -140,7 +140,7 @@ exports.handleAPI = async (request, response) => {
 				writejson.write({success: true}, response);
 			});
 		} else {
-			writejson.write({success: false}, response, 404);
+			writejson.write({success: false}, response, 204);
 		}
 	} else {
 		return errors.abortRequest(request, response, 500, 'Unrecognized API');

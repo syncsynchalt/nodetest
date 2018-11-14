@@ -10,6 +10,7 @@ exports.checkLogin = (user, pass) => {
 	pass = pass || '';
 
 	// todo - work out our utf-8 serialization strategy
+	// in a real application this would be bcrypt instead of sha256
 	let hashedPass = crypto.createHash('sha256').update(pass).digest('hex');
 	return !!(user && pass && hashedPass === userData[user]);
 };

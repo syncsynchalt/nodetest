@@ -65,7 +65,7 @@ function callUpdate() {
 	let xhr = new XMLHttpRequest();
 	xhr.onload = () => {
 		if (xhr.status != 200) {
-			errorMsg.textContent = 'Request failed: ' + xhr.responseText;
+			errorMsg.textContent = `${xhr.status} ${xhr.responseText}`;
 			successMsg.textContent = '';
 			return;
 		} else {
