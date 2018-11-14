@@ -4,6 +4,7 @@ let url = require('url');
 let errors = require(__dirname + '/../service/errors.js');
 let postdata = require(__dirname + '/../service/postdata.js');
 let writejson = require(__dirname + '/../service/writejson.js');
+let params = require(__dirname + '/../service/params.js');
 
 const CONFIGS_DIR = __dirname + '/../data/configs/';
 
@@ -13,6 +14,9 @@ exports.handleAPI = async (request, response) => {
 	let result = {configurations: []};
 	if (request.method === 'GET' && u.pathname === '/api/configs/') {
 		// list all configs
+
+		let parms = await params.parse(request);
+
 		fs.readdir(CONFIGS_DIR, function(err, items) {
 			if (err) {
 				throw err;
@@ -31,6 +35,18 @@ exports.handleAPI = async (request, response) => {
 				promises.push(p);
 			}
 			Promise.all(promises).then((objs) => {
+				if (parms.sortKey) {
+					let k = parms.sortKey;
+					objs = objs.sort((a, b) => {
+						if ((!a[k] && !b[k]) || a[k] == b[k]) {
+							return 0;
+						} else if (!a[k] || a[k] < b[k]) {
+							return -1;
+						} else {
+							return 1;
+						}
+					});
+				}
 				result.configurations = objs;
 				writejson.write(result, response);
 			});

@@ -13,9 +13,51 @@
 </head>
 <body>
 <div class="container">
-	<p>Click below to demonstrate the <tt>/api/configs/</tt> "configs list" endpoint using the <tt>GET</tt> verb.
-	<form method="GET" action="/api/configs/">
-		<button type="submit" class="btn btn-primary">List</button>
-	</form>
+	<p>List the available configurations. Click below to
+	demonstrate the <tt>/api/configs/</tt> endpoint using the
+	<tt>GET</tt> verb.
+
+	<div class="form-group">
+		<textarea id="listing" name="listing" rows="50" cols="100">
+		</textarea>
+	</div>
+	<div class="form-group">
+		<label for="sortKey">Sort key</label>
+		<input type="text" id="sortKey" name="sortKey" placeholder="optional"></input>
+    </div>
+	<button class="btn btn-primary" onclick="callList()">List</button>
+
+	<p class="text-danger" id="errorMsg"></p>
 </div>
+<script>
+function callList() {
+	// small enough that we just embed it in the HTML
+	let errorMsg = document.getElementById('errorMsg');
+	let listing = document.getElementById('listing');
+	let sortKey = document.getElementById('sortKey').value;
+
+	let xhr = new XMLHttpRequest();
+	xhr.onload = () => {
+		if (xhr.status != 200) {
+			errorMsg.textContent = 'Request failed: ' + xhr.responseText;
+			listing.value = '';
+			return;
+		} else {
+			errorMsg.textContent = '';
+			listing.value = xhr.responseText;
+			return;
+		}
+	};
+	let url = '/api/configs/';
+	let params = '';
+	if (sortKey) {
+		params = params + 'sortKey=' + sortKey;
+	}
+	if (params) {
+		url = url + '?' + params;
+	}
+	xhr.open('GET', url);
+	xhr.send();
+}
+</script>
 </body>
