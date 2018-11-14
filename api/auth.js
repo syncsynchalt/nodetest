@@ -21,9 +21,10 @@ exports.handleAPI = async (request, response) => {
 		} else {
 			let sess = session.create(user);
 			// set a cookie
+			let expiration = new Date();
+			expiration.setYear(expiration.getFullYear()+1);
 			response.writeHead(302, {
-				// xxx todo dynamic date
-				'Set-Cookie': 'sessionToken=' + sess + '; path=/; expires=Mon, 13 Nov 2028 00:00:00 GMT',
+				'Set-Cookie': `sessionToken=${sess}; path=/; expires=${expiration.toUTCString()}`,
 				'Location': '/'
 			});
 			response.end();
