@@ -14,7 +14,7 @@
 <body>
 <div class="container">
 	<p>Click a config below.  It must be valid JSON, and must have a unique "name" key.
-	<p>This uses the <tt>/api/configs/</tt> endpoint with the <tt>PUT</tt> verb.
+	<p>This uses the <tt>/api/configs/</tt> endpoint with the <tt>POST</tt> verb.
 
 	<div class="form-group">
 		<textarea id="config" name="config" rows="20" cols="100">
@@ -58,7 +58,7 @@ function callCreate() {
 			return;
 		}
 	};
-	xhr.open('PUT', '/api/configs/');
+	xhr.open('POST', '/api/configs/');
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.send(conf);
 }

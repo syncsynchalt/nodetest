@@ -35,7 +35,7 @@ exports.handleAPI = async (request, response) => {
 				writejson.write(result, response);
 			});
 		});
-	} else if (request.method === 'PUT' && u.pathname === '/api/configs/') {
+	} else if (request.method === 'POST' && u.pathname === '/api/configs/') {
 		// create a config
 		postdata.get(request).then(data => {
 			let config = JSON.parse(data);
@@ -51,7 +51,11 @@ exports.handleAPI = async (request, response) => {
 				if (err) {
 					throw err;
 				}
-				writejson.write({success: true, msg: 'created ' + config.name}, response);
+				writejson.write({
+					success: true,
+					msg: 'created ' + config.name,
+					uri: '/api/configs/' + querystring.escape(config.name)
+				}, response);
 			});
 		});
 	} else {
