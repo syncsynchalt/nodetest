@@ -5,7 +5,6 @@ if (!sess) {
 	throw new Error('create session failed, should have succeeded');
 }
 if (session.lookup(sess) !== 'foo') {
-	console.log("got " + session.lookup(sess));
 	throw new Error('lookup session failed, should have succeeded');
 }
 session.delete(sess);
