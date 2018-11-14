@@ -3,13 +3,13 @@ let fs = require('fs');
 const SESSION_DIR = __dirname + '/../sessions/';
 const CHECK_SESSION_REGEX = /^[a-z0-9]+$/;
 
-exports.create = function createSession(user) {
+exports.create = (user) => {
 	let filename = randomString();
 	fs.writeFileSync(SESSION_DIR + filename, user, 'utf8');
 	return filename;
 };
 
-exports.lookup = function lookupSession(session) {
+exports.lookup = (session) => {
 	if (!CHECK_SESSION_REGEX.test(session)) {
 		return false;
 	}
@@ -22,7 +22,7 @@ exports.lookup = function lookupSession(session) {
 	}
 };
 
-exports.delete = function deleteSession(session) {
+exports.delete = (session) => {
 	if (CHECK_SESSION_REGEX.test(session)) {
 		fs.unlink(SESSION_DIR + session, err => {
 			if (err) {
@@ -32,7 +32,7 @@ exports.delete = function deleteSession(session) {
 	}
 };
 
-exports.getFromHttpRequest = function getSessionFromRequest(request) {
+exports.getFromHttpRequest = (request) => {
 	if (!request || !request.headers || !request.headers.cookie) {
 		return false;
 	}

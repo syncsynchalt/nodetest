@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<style>
+		.container {
+			margin-top: 1em;
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<p>Click a config below.  It must be valid JSON, and must have a unique "name" key.
+	<p>This uses the <tt>/api/configs/</tt> endpoint with the <tt>PUT</tt> verb.
+
+	<div class="form-group">
+		<textarea id="config" name="config" rows="20" cols="100">
+{
+	"name": "changeme",
+	"hostname": "changeme.example.com",
+	"port": 1234,
+	"username": "testuser"
+}
+		</textarea>
+	</div>
+
+	<button class="btn btn-primary" onclick="callCreate()">Create</button>
+	<p class="text-success" id="successMsg"></p>
+	<p class="text-danger" id="errorMsg"></p>
+</div>
+<script>
+function callCreate() {
+	// small enough that we just embed it in the HTML
+	let successMsg = document.getElementById('successMsg');
+	let errorMsg = document.getElementById('errorMsg');
+	let conf = document.getElementById('config').value;
+	let obj;
+	try {
+		obj = JSON.parse(conf);
+	}
+	catch (err) {
+		errorMsg.textContent = 'Unable to parse JSON: ' + err;
+		successMsg.textContent = '';
+		return;
+	}
+	let xhr = new XMLHttpRequest();
+	xhr.onload = () => {
+		if (xhr.status != 200) {
+			errorMsg.textContent = 'Request failed: ' + xhr.responseText;
+			successMsg.textContent = '';
+			return;
+		} else {
+			errorMsg.textContent = '';
+			successMsg.textContent = 'Success: ' + xhr.responseText;
+			return;
+		}
+	};
+	xhr.open('PUT', '/api/configs/');
+	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+	xhr.send(conf);
+}
+</script>
+</body>

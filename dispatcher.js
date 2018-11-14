@@ -7,7 +7,7 @@ const SAFE_PAGES = [ '/api/auth/login', '/api/auth/login', '/login.html', '/logi
 const START_PAGE = '/login.html';
 const API_REGEX = new RegExp('^/api/([a-z]+)/.*$');
 
-exports.dispatch = function dispatchRequest(request, response, params) {
+exports.dispatch = async (request, response) => {
 	let u = url.parse(request.url);
 	console.log(`Dispatching ${u.pathname}`);
 
@@ -23,7 +23,7 @@ exports.dispatch = function dispatchRequest(request, response, params) {
 		}
 		try {
 			let api = require(__dirname + '/api/' + matches[1] + '.js');
-			api.handleAPI(request, response, params);
+			await api.handleAPI(request, response);
 		}
 		catch (e) {
 			return errors.abortRequest(request, response, 500, 'Unrecognized API');

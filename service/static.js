@@ -20,7 +20,7 @@ function sanitizePath(path) {
 	return path;
 }
 
-exports.serve = function serveStatic(request, response, _params) {
+exports.serve = (request, response) => {
 	let path;
 	if (typeof request === 'string') {
 		path = request;

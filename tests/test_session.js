@@ -1,20 +1,11 @@
 let session = require(__dirname + '/../service/session.js');
+let assert = require('assert');
 
 let sess = session.create('foo');
-if (!sess) {
-	throw new Error('create session failed, should have succeeded');
-}
-if (session.lookup(sess) !== 'foo') {
-	throw new Error('lookup session failed, should have succeeded');
-}
+assert(sess);
+assert.strictEqual(session.lookup(sess), 'foo');
 session.delete(sess);
 
-if (session.lookup('') !== false) {
-	throw new Error('lookup session blank succeeded, should have failed');
-}
-if (session.lookup(null) !== false) {
-	throw new Error('lookup session null succeeded, should have failed');
-}
-if (session.lookup(undefined) !== false) {
-	throw new Error('lookup session undefined succeeded, should have failed');
-}
+assert.strictEqual(session.lookup(''), false);
+assert.strictEqual(session.lookup(null), false);
+assert.strictEqual(session.lookup(undefined), false);

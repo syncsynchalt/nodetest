@@ -1,23 +1,10 @@
 let auth = require(__dirname + '/../service/auth.js');
+let assert = require('assert');
 
-if (auth.checkLogin('testuser', 'testpass') !== true) {
-	throw new Error('test login failed, should have succeeded');
-}
-if (auth.checkLogin('', '') !== false) {
-	throw new Error('empty login failed, should have succeeded');
-}
-if (auth.checkLogin(null, null) !== false) {
-	throw new Error('null login failed, should have succeeded');
-}
-if (auth.checkLogin(undefined, undefined) !== false) {
-	throw new Error('null login failed, should have succeeded');
-}
-if (auth.checkLogin('testuser', null) !== false) {
-	throw new Error('test/null login failed, should have succeeded');
-}
-if (auth.checkLogin('testuser', '') !== false) {
-	throw new Error('test/blank login failed, should have succeeded');
-}
-if (auth.checkLogin('testuser', undefined) !== false) {
-	throw new Error('test/undefined login failed, should have succeeded');
-}
+assert.strictEqual(auth.checkLogin('testuser', 'testpass'), true);
+assert.strictEqual(auth.checkLogin('', ''), false);
+assert.strictEqual(auth.checkLogin(null, null), false);
+assert.strictEqual(auth.checkLogin(undefined, undefined), false);
+assert.strictEqual(auth.checkLogin('testuser', null), false);
+assert.strictEqual(auth.checkLogin('testuser', ''), false);
+assert.strictEqual(auth.checkLogin('testuser', undefined), false);

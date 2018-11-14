@@ -2,13 +2,15 @@ let url = require('url');
 let auth = require(__dirname + '/../service/auth.js');
 let session = require(__dirname + '/../service/session.js');
 let errors = require(__dirname + '/../service/errors.js');
+let params = require(__dirname + '/../service/params.js');
 
-exports.handleAPI = function handleAuthAPI(request, response, params) {
+exports.handleAPI = async (request, response) => {
+	let parms = await params.parse(request, response);
 	let u = url.parse(request.url);
 
 	if (u.pathname === '/api/auth/login') {
-		let user = params.user || 'unset';
-		let pass = params.pass || '';
+		let user = parms.user || 'unset';
+		let pass = parms.pass || '';
 
 		if (!auth.checkLogin(user, pass)) {
 			response.writeHead(302, {
