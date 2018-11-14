@@ -11,13 +11,10 @@ exports.checkLogin = function checkLogin(user, pass) {
 
 	// todo - work out our utf-8 serialization strategy
 	let hashedPass = crypto.createHash('sha256').update(pass).digest('hex');
-	return user && pass && hashedPass === userData[user];
+	return !!(user && pass && hashedPass === userData[user]);
 };
 
 exports.isLoggedIn = function isLoggedIn(request) {
-	if (!request.headers.cookie) {
-		return false;
-	}
 	let sess = session.getFromHttpRequest(request);
 	return (sess !== false && session.lookup(sess) !== false);
 };

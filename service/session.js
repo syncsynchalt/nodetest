@@ -5,7 +5,7 @@ const CHECK_SESSION_REGEX = /^[a-z0-9]+$/;
 
 exports.create = function createSession(user) {
 	let filename = randomString();
-	fs.writeFileSync(SESSION_DIR + filename, user);
+	fs.writeFileSync(SESSION_DIR + filename, user, 'utf8');
 	return filename;
 };
 
@@ -14,7 +14,7 @@ exports.lookup = function lookupSession(session) {
 		return false;
 	}
 	try {
-		let user = fs.readFileSync(SESSION_DIR + session);
+		let user = fs.readFileSync(SESSION_DIR + session, 'utf8');
 		return user;
 	}
 	catch(err) {
@@ -33,6 +33,9 @@ exports.delete = function deleteSession(session) {
 };
 
 exports.getFromHttpRequest = function getSessionFromRequest(request) {
+	if (!request || !request.headers || !request.headers.cookie) {
+		return false;
+	}
 	let cookies = request.headers.cookie.split(';');
 	for (let cookie of cookies) {
 		cookie = cookie.trim();
