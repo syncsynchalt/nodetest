@@ -16,6 +16,7 @@
 	<p>Create a config below.  It must be valid JSON, and must have a unique "name" key.
 	<p>This demonstrates the <tt>/api/configs/</tt> endpoint with the <tt>POST</tt> verb.
 
+	<form onsubmit="callCreate(); return false">
 	<div class="form-group">
 		<textarea id="config" name="config" rows="20" cols="100">
 {
@@ -26,8 +27,9 @@
 }
 		</textarea>
 	</div>
+	<button class="btn btn-primary" type="submit">Create</button>
+	</form>
 
-	<button class="btn btn-primary" onclick="callCreate()">Create</button>
 	<p class="text-success" id="successMsg"></p>
 	<p class="text-danger" id="errorMsg"></p>
 </div>

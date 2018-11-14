@@ -34,11 +34,16 @@
 function loadConfig() {
 	let conf = document.getElementById('config');
 	let key = document.getElementById('name').value;
+	if (!key) {
+		return;
+	}
 	let xhr = new XMLHttpRequest();
 	xhr.onload = () => {
 		if (xhr.status == 200) {
 			let obj = JSON.parse(xhr.responseText);
 			conf.value = JSON.stringify(obj.configuration, null, 2);
+		} else {
+			conf.value = '';
 		}
 	};
 	xhr.open('GET', '/api/configs/' + encodeURIComponent(key));

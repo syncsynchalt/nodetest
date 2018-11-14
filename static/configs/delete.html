@@ -16,11 +16,14 @@
 	<p>Delete a config by its "name" key.
 	<p>This demonstrates the <tt>/api/configs/{name}</tt> endpoint with the <tt>DELETE</tt> verb.
 
+	<form onsubmit="callDelete(); return false">
 	<div class="form-group">
 		<label for="name">Name</label>
 		<input type="text" id="name" name="name" placeholder="key"></input>
 	</div>
-	<button class="btn btn-primary" onclick="callDelete()">Delete</button>
+	<button class="btn btn-primary" type="submit">Delete</button>
+	</form>
+
 	<p class="text-success" id="successMsg"></p>
 	<p class="text-danger" id="errorMsg"></p>
 </div>

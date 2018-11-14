@@ -15,12 +15,14 @@
 <div class="container">
 	<p>Creates random test data.
 
+	<form onsubmit="callGenerate(); return false">
 	<div class="form-group">
 		<label for="name">Number of records</label>
 		<input type="number" id="amount" value=100></input>
 	</div>
+	<button class="btn btn-primary" type="submit">Generate</button>
+	</form>
 
-	<button class="btn btn-primary" onclick="callGenerate()">Generate</button>
 	<p class="text-success" id="successMsg"></p>
 	<p class="text-danger" id="errorMsg"></p>
 </div>

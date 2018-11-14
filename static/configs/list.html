@@ -17,15 +17,29 @@
 	demonstrate the <tt>/api/configs/</tt> endpoint using the
 	<tt>GET</tt> verb.
 
+	<form onsubmit="callList(); return false">
 	<div class="form-group">
-		<textarea id="listing" name="listing" rows="50" cols="100">
+		<textarea id="listing" name="listing" rows="25" cols="100">
 		</textarea>
 	</div>
 	<div class="form-group">
 		<label for="sortKey">Sort key</label>
 		<input type="text" id="sortKey" name="sortKey" placeholder="optional"></input>
 	</div>
-	<button class="btn btn-primary" onclick="callList()">List</button>
+	<div class="form-group">
+		<label for="offset">Start</label>
+		<input type="number" id="offset" name="offset" value="0"></input>
+	</div>
+	<div class="form-group">
+		<label for="limit">Max Records</label>
+		<input type="number" id="limit" name="limit" value="10"></input>
+	</div>
+	<div class="form-group">
+		<button class="btn btn-primary" onclick="callList()" type="submit">List</button>
+		<button class="btn btn-primary" onclick="listPrev()">&lt; Prev</button>
+		<button class="btn btn-primary" onclick="listNext()">Next &gt;</button>
+	</div>
+	</form>
 
 	<p class="text-danger" id="errorMsg"></p>
 </div>
@@ -35,6 +49,8 @@ function callList() {
 	let errorMsg = document.getElementById('errorMsg');
 	let listing = document.getElementById('listing');
 	let sortKey = document.getElementById('sortKey').value;
+	let offset = document.getElementById('offset').value || 0;
+	let limit = document.getElementById('limit').value || 0;
 
 	let xhr = new XMLHttpRequest();
 	xhr.onload = () => {
@@ -50,14 +66,30 @@ function callList() {
 	};
 	let url = '/api/configs/';
 	let params = '';
-	if (sortKey) {
-		params = params + 'sortKey=' + sortKey;
-	}
+	if (sortKey) { params += '&sortKey=' + sortKey; }
+	if (offset) { params += '&offset=' + offset; }
+	if (limit) { params += '&limit=' + limit; }
 	if (params) {
-		url = url + '?' + params;
+		params = params.replace(/^./, '?');
+		url = url + params;
 	}
 	xhr.open('GET', url);
 	xhr.send();
+}
+function listNext() {
+	let offEl = document.getElementById('offset');
+	let limEl = document.getElementById('limit');
+	offEl.value = parseInt(offEl.value || 0, 10) + parseInt(limEl.value || 0, 10);
+	callList();
+}
+function listPrev() {
+	let offEl = document.getElementById('offset');
+	let limEl = document.getElementById('limit');
+	offEl.value = parseInt(offEl.value || 0, 10) - parseInt(limEl.value || 0, 10);
+	if (offEl.value < 0) {
+		offEl.value = 0;
+	}
+	callList();
 }
 </script>
 </body>

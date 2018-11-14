@@ -47,6 +47,12 @@ exports.handleAPI = async (request, response) => {
 						}
 					});
 				}
+				if (parms.offset && isInt(parms.offset)) {
+					objs = objs.slice(parseInt(parms.offset, 10));
+				}
+				if (parms.limit && isInt(parms.limit)) {
+					objs = objs.slice(0, parseInt(parms.limit, 10));
+				}
 				result.configurations = objs;
 				writejson.write(result, response);
 			});
@@ -160,4 +166,8 @@ function configExists(name) {
 
 function getConfigFilename(name) {
 	return CONFIGS_DIR + querystring.escape(name) + '.json';
+}
+
+function isInt(n) {
+	return (n+'').match(/^[0-9]+$/);
 }
