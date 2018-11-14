@@ -58,6 +58,26 @@ exports.handleAPI = async (request, response) => {
 				}, response);
 			});
 		});
+	} else if (request.method === 'DELETE') {
+		// delete a config by name
+		if (!u.pathname.startsWith('/api/configs/')) {
+			throw new Error(`assert failed, ${u.pathname} doesn't start as expected`);
+		}
+
+		let key = u.pathname.slice('/api/configs/'.length);
+		key = querystring.unescape(key);
+
+		if (configExists(key)) {
+			let file = getConfigFilename(key);
+			fs.unlink(file, err => {
+				if (err) {
+					throw err;
+				}
+				writejson.write({success: true}, response);
+			});
+		} else {
+			writejson.write({success: false}, response);
+		}
 	} else {
 		return errors.abortRequest(request, response, 500, 'Unrecognized API');
 	}

@@ -6,10 +6,11 @@ let errors = require(__dirname + '/service/errors.js');
 
 http.createServer(async (request, response) => {
 	try {
-		return dispatcher.dispatch(request, response);
+		return await dispatcher.dispatch(request, response);
 	}
 	catch (err) {
 		console.error('Aborting on error ' + err);
+		console.error(err.stack);
 		errors.abortRequest(request, response, 500, 'Internal server error');
 	}
 }).listen(8082);

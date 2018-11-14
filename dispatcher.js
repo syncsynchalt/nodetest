@@ -21,13 +21,14 @@ exports.dispatch = async (request, response) => {
 		if (!matches) {
 			return errors.abortRequest(request, response, 500, 'Unrecognized API');
 		}
+		let api;
 		try {
-			let api = require(__dirname + '/api/' + matches[1] + '.js');
-			await api.handleAPI(request, response);
+			api = require(__dirname + '/api/' + matches[1] + '.js');
 		}
 		catch (e) {
 			return errors.abortRequest(request, response, 500, 'Unrecognized API');
 		}
+		await api.handleAPI(request, response);
 	} else {
 		// otherwise serve static/*.html
 		static.serve(request, response);

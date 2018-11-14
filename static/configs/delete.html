@@ -13,39 +13,24 @@
 </head>
 <body>
 <div class="container">
-	<p>Click a config below.  It must be valid JSON, and must have a unique "name" key.
-	<p>This demonstrates the <tt>/api/configs/</tt> endpoint with the <tt>POST</tt> verb.
+	<p>Delete a config by its "name" key.
+	<p>This demonstrates the <tt>/api/configs/{name}</tt> endpoint with the <tt>DELETE</tt> verb.
 
 	<div class="form-group">
-		<textarea id="config" name="config" rows="20" cols="100">
-{
-	"name": "changeme",
-	"hostname": "changeme.example.com",
-	"port": 1234,
-	"username": "testuser"
-}
-		</textarea>
+		<label for="name">Name</label>
+		<input type="text" id="name" name="name" placeholder="key"></input>
 	</div>
-
-	<button class="btn btn-primary" onclick="callCreate()">Create</button>
+	<button class="btn btn-primary" onclick="callDelete()">Delete</button>
 	<p class="text-success" id="successMsg"></p>
 	<p class="text-danger" id="errorMsg"></p>
 </div>
 <script>
-function callCreate() {
+function callDelete() {
 	// small enough that we just embed it in the HTML
 	let successMsg = document.getElementById('successMsg');
 	let errorMsg = document.getElementById('errorMsg');
-	let conf = document.getElementById('config').value;
-	let obj;
-	try {
-		obj = JSON.parse(conf);
-	}
-	catch (err) {
-		errorMsg.textContent = 'Unable to parse JSON: ' + err;
-		successMsg.textContent = '';
-		return;
-	}
+	let key = document.getElementById('name').value;
+
 	let xhr = new XMLHttpRequest();
 	xhr.onload = () => {
 		if (xhr.status != 200) {
@@ -58,9 +43,8 @@ function callCreate() {
 			return;
 		}
 	};
-	xhr.open('POST', '/api/configs/');
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.send(conf);
+	xhr.open('DELETE', '/api/configs/' + encodeURIComponent(key));
+	xhr.send();
 }
 </script>
 </body>
