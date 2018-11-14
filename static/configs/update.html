@@ -13,26 +13,37 @@
 </head>
 <body>
 <div class="container">
-	<p>Create a config below.  It must be valid JSON, and must have a unique "name" key.
-	<p>This demonstrates the <tt>/api/configs/</tt> endpoint with the <tt>POST</tt> verb.
+	<p>Modify a config below.  Enter the "name" for the record you are interested in, and it will be populated in the textarea for your editing convenience.
+	<p>This demonstrates the <tt>/api/configs/</tt> endpoint with the <tt>PATCH</tt> verb.
 
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="key" onkeyup="loadConfig()"></input>
+    </div>
 	<div class="form-group">
 		<textarea id="config" name="config" rows="20" cols="100">
-{
-	"name": "changeme",
-	"hostname": "changeme.example.com",
-	"port": 1234,
-	"username": "testuser"
-}
 		</textarea>
 	</div>
 
-	<button class="btn btn-primary" onclick="callCreate()">Create</button>
+	<button class="btn btn-primary" onclick="callUpdate()">Update</button>
 	<p class="text-success" id="successMsg"></p>
 	<p class="text-danger" id="errorMsg"></p>
 </div>
 <script>
-function callCreate() {
+function loadConfig() {
+	let conf = document.getElementById('config');
+	let key = document.getElementById('name').value;
+	let xhr = new XMLHttpRequest();
+	xhr.onload = () => {
+		if (xhr.status == 200) {
+			let obj = JSON.parse(xhr.responseText);
+			conf.value = JSON.stringify(obj.configuration, null, 2);
+		}
+	};
+	xhr.open('GET', '/api/configs/' + encodeURIComponent(key));
+	xhr.send();
+}
+function callUpdate() {
 	// small enough that we just embed it in the HTML
 	let successMsg = document.getElementById('successMsg');
 	let errorMsg = document.getElementById('errorMsg');
@@ -58,7 +69,7 @@ function callCreate() {
 			return;
 		}
 	};
-	xhr.open('POST', '/api/configs/');
+	xhr.open('PATCH', '/api/configs/');
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.send(conf);
 }

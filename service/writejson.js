@@ -1,7 +1,8 @@
-exports.write = (data, response) => {
+exports.write = (data, response, code) => {
+	code = code || 200;
 	if (typeof data === 'object') {
 		data = JSON.stringify(data, null, 2);
 	}
-	response.writeHead(200, {'Content-Type': 'text/json'});
+	response.writeHead(code, {'Content-Type': 'text/json'});
 	response.end(data);
 };
