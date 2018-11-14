@@ -25,14 +25,17 @@
 	<div class="form-group">
 		<label for="sortKey">Sort key</label>
 		<input type="text" id="sortKey" name="sortKey" placeholder="optional"></input>
+		<small>(param ?sortKey=column)</small>
 	</div>
 	<div class="form-group">
 		<label for="offset">Start</label>
 		<input type="number" id="offset" name="offset" value="0"></input>
+		<small>(param ?offset=nnn)</small>
 	</div>
 	<div class="form-group">
 		<label for="limit">Max Records</label>
 		<input type="number" id="limit" name="limit" value="10"></input>
+		<small>(param ?limit=nnn)</small>
 	</div>
 	<div class="form-group">
 		<button class="btn btn-primary" onclick="callList()" type="submit">List</button>
