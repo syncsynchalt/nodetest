@@ -32,6 +32,17 @@ exports.delete = function deleteSession(session) {
 	}
 };
 
+exports.getFromHttpRequest = function getSessionFromRequest(request) {
+	let cookies = request.headers.cookie.split(';');
+	for (let cookie of cookies) {
+		cookie = cookie.trim();
+		if (cookie.startsWith('sessionToken=')) {
+			return cookie.slice('sessionToken='.length);
+		}
+	}
+	return false;
+};
+
 function randomString() {
 	// credit to tbanik@github https://gist.github.com/6174/6062387
 	return [...Array(20)].map(_=>(~~(Math.random()*36)).toString(36)).join('');

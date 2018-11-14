@@ -32,7 +32,7 @@ exports.serve = function serveStatic(request, response, _params) {
 		path = '/index.html';
 	}
 
-	const stream = fs.createReadStream(__dirname + '/../webroot/' + path);
+	const stream = fs.createReadStream(__dirname + '/../static/' + path);
 	stream.on('error', function(err) {
 		if (err.code === 'ENOENT') {
 			response.writeHead(404, {'Content-Type': 'text/plain'});

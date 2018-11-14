@@ -4,14 +4,9 @@ let http = require('http');
 let url = require('url');
 let querystring = require('querystring');
 let dispatcher = require(__dirname + '/dispatcher.js');
+let errors = require(__dirname + '/service/errors.js');
 
 const POST_LIMIT_BYTES = 1000000;
-
-function abortRequest(request, response, code, msg) {
-	response.writeHead(code, {'Content-Type': 'text/plain'});
-	response.end('Error: ' + msg + '\n');
-	request.connection.destroy();
-}
 
 async function parsePostParams(request, response) {
 	return new Promise((resolve, _reject) => {
@@ -20,7 +15,7 @@ async function parsePostParams(request, response) {
 			queryData += data;
 			if(queryData.length > POST_LIMIT_BYTES) {
 				queryData = '';
-				return abortRequest(request, response, 413, 'POST content too large');
+				return errors.abortRequest(request, response, 413, 'POST content too large');
 			}
 		});
 		request.on('end', function() {
@@ -41,7 +36,7 @@ http.createServer(async (request, response) => {
 	} else if (request.method === 'GET') {
 		params = parseGetParams(request, response);
 	} else {
-		return abortRequest(request, response, 500, 'HTTP method not handled');
+		return errors.abortRequest(request, response, 500, 'HTTP method not handled');
 	}
 
 	return dispatcher.dispatch(request, response, params);
