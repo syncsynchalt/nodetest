@@ -11,7 +11,7 @@ exports.dispatch = async (request, response) => {
 	let u = url.parse(request.url);
 	console.log(`Dispatching ${request.method} ${u.pathname}`);
 
-	if (!SAFE_PAGES.includes(u.pathname) && !auth.isLoggedIn(request)) {
+	if (!SAFE_PAGES.includes(u.pathname) && await !auth.isLoggedIn(request)) {
 		// redirect unauthed users to static/login.html
 		response.writeHead(302, {'Location': START_PAGE});
 		response.end();
@@ -26,6 +26,7 @@ exports.dispatch = async (request, response) => {
 			api = require(__dirname + '/api/' + matches[1] + '.js');
 		}
 		catch (e) {
+			console.log(`Caught exception: ${e} ${e.stack}`);
 			return errors.abortRequest(request, response, 500, 'Unrecognized API');
 		}
 		await api.handleAPI(request, response);

@@ -19,7 +19,7 @@ exports.handleAPI = async (request, response) => {
 			});
 			response.end();
 		} else {
-			let sess = session.create(user);
+			let sess = await session.create(user);
 			// set a cookie
 			let expiration = new Date();
 			expiration.setYear(expiration.getFullYear()+1);

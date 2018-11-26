@@ -65,7 +65,7 @@ exports.handleAPI = async (request, response) => {
 
 		let key = u.pathname.slice('/api/configs/'.length);
 		key = querystring.unescape(key);
-		if (configExists(key)) {
+		if (await configExists(key)) {
 			let file = getConfigFilename(key);
 			fs.readFile(file, 'utf8', (err, data) => {
 				if (err) {
@@ -78,49 +78,47 @@ exports.handleAPI = async (request, response) => {
 		}
 	} else if (request.method === 'POST' && u.pathname === '/api/configs/') {
 		// create a config
-		postdata.get(request).then(data => {
-			let config = JSON.parse(data);
-			if (!config.name) {
-				return errors.abortRequest(request, response, 500, 'No name given');
+		let data = await postdata.get(request);
+		let config = JSON.parse(data);
+		if (!config.name) {
+			return errors.abortRequest(request, response, 500, 'No name given');
+		}
+		if (await configExists(config.name)) {
+			// known issue: race condition here
+			return errors.abortRequest(request, response, 409, 'Already exists');
+		}
+		let file = getConfigFilename(config.name);
+		fs.writeFile(file, data, 'utf8', (err) => {
+			if (err) {
+				throw err;
 			}
-			if (configExists(config.name)) {
-				// known issue: race condition here
-				return errors.abortRequest(request, response, 409, 'Already exists');
-			}
-			let file = getConfigFilename(config.name);
-			fs.writeFile(file, data, 'utf8', (err) => {
-				if (err) {
-					throw err;
-				}
-				writejson.write({
-					success: true,
-					msg: 'created ' + config.name,
-					uri: '/api/configs/' + querystring.escape(config.name)
-				}, response);
-			});
+			writejson.write({
+				success: true,
+				msg: 'created ' + config.name,
+				uri: '/api/configs/' + querystring.escape(config.name)
+			}, response);
 		});
 	} else if (request.method === 'PATCH' && u.pathname === '/api/configs/') {
-		// create a config
-		postdata.get(request).then(data => {
-			let config = JSON.parse(data);
-			if (!config.name) {
-				return errors.abortRequest(request, response, 500, 'No name given');
+		// update a config
+		let data = await postdata.get(request);
+		let config = JSON.parse(data);
+		if (!config.name) {
+			return errors.abortRequest(request, response, 500, 'No name given');
+		}
+		if (await !configExists(config.name)) {
+			// known issue: race condition here
+			return errors.abortRequest(request, response, 204, 'Does not exist');
+		}
+		let file = getConfigFilename(config.name);
+		fs.writeFile(file, data, 'utf8', (err) => {
+			if (err) {
+				throw err;
 			}
-			if (!configExists(config.name)) {
-				// known issue: race condition here
-				return errors.abortRequest(request, response, 204, 'Does not exist');
-			}
-			let file = getConfigFilename(config.name);
-			fs.writeFile(file, data, 'utf8', (err) => {
-				if (err) {
-					throw err;
-				}
-				writejson.write({
-					success: true,
-					msg: 'updated ' + config.name,
-					uri: '/api/configs/' + querystring.escape(config.name)
-				}, response);
-			});
+			writejson.write({
+				success: true,
+				msg: 'updated ' + config.name,
+				uri: '/api/configs/' + querystring.escape(config.name)
+			}, response);
 		});
 	} else if (request.method === 'DELETE') {
 		// delete a config by name
@@ -131,7 +129,7 @@ exports.handleAPI = async (request, response) => {
 		let key = u.pathname.slice('/api/configs/'.length);
 		key = querystring.unescape(key);
 
-		if (configExists(key)) {
+		if (await configExists(key)) {
 			let file = getConfigFilename(key);
 			fs.unlink(file, err => {
 				if (err) {
@@ -150,18 +148,19 @@ exports.handleAPI = async (request, response) => {
 // expose for testing
 exports.exists = configExists;
 
-function configExists(name) {
-	try {
-		let file = getConfigFilename(name);
-		fs.statSync(file);
-		return true;
-	}
-	catch (err) {
-		if (err.code === 'ENOENT') {
-			return false;
-		}
-		throw err;
-	}
+async function configExists(name) {
+	let file = getConfigFilename(name);
+	return new Promise((resolve, reject) => {
+		fs.stat(file, (err) => {
+			if (err && err.code === 'ENOENT') {
+				resolve(false);
+			} else if (err) {
+				reject(err);
+			} else {
+				resolve(true);
+			}
+		});
+	});
 }
 
 function getConfigFilename(name) {

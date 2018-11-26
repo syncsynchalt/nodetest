@@ -15,7 +15,7 @@ exports.checkLogin = (user, pass) => {
 	return !!(user && pass && hashedPass === userData[user]);
 };
 
-exports.isLoggedIn = (request) => {
-	let sess = session.getFromHttpRequest(request);
+exports.isLoggedIn = async (request) => {
+	let sess = await session.getFromHttpRequest(request);
 	return (sess !== false && session.lookup(sess) !== false);
 };
