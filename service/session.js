@@ -1,44 +1,25 @@
-let fs = require('fs');
+let fspromise = require(__dirname + '/fspromise.js');
 
 const SESSION_DIR = __dirname + '/../sessions/';
 const CHECK_SESSION_REGEX = /^[a-z0-9]+$/;
 
 exports.create = async (user) => {
 	let filename = randomString();
-	return new Promise(resolve => {
-		fs.writeFile(SESSION_DIR + filename, user, 'utf8', () => {
-			resolve(filename);
-		});
-	});
+	return fspromise.writeFile(SESSION_DIR + filename, user, 'utf8').then(() => {return filename;});
 };
 
 exports.lookup = async (session) => {
 	if (!CHECK_SESSION_REGEX.test(session)) {
 		return false;
 	}
-	return new Promise(resolve => {
-		fs.readFile(SESSION_DIR + session, 'utf8', (err, data) => {
-			if (err) {
-				resolve(false);
-			}
-			resolve(data);
-		});
-	});
+	return fspromise.readFile(SESSION_DIR + session, 'utf8').catch(() => { return false; });
 };
 
 exports.delete = async (session) => {
 	if (!CHECK_SESSION_REGEX.test(session)) {
-		throw Error("Bad session");
+		throw Error('Bad session');
 	}
-	return new Promise((resolve, reject) => {
-		fs.unlink(SESSION_DIR + session, err => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve();
-			}
-		});
-	});
+	return fspromise.unlink(SESSION_DIR + session);
 };
 
 exports.getFromHttpRequest = (request) => {

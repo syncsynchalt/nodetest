@@ -12,7 +12,7 @@ exports.handleAPI = async (request, response) => {
 		let user = parms.user || 'unset';
 		let pass = parms.pass || '';
 
-		if (!auth.checkLogin(user, pass)) {
+		if (!await auth.checkLogin(user, pass)) {
 			response.writeHead(302, {
 				'Set-Cookie': 'sessionToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT',
 				'Location': '/loginfailed.html'

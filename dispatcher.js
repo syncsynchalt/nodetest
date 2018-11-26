@@ -11,27 +11,26 @@ exports.dispatch = async (request, response) => {
 	let u = url.parse(request.url);
 	console.log(`Dispatching ${request.method} ${u.pathname}`);
 
-	if (!SAFE_PAGES.includes(u.pathname) && await !auth.isLoggedIn(request)) {
-		// redirect unauthed users to static/login.html
-		response.writeHead(302, {'Location': START_PAGE});
-		response.end();
-	} else if (u.pathname.startsWith('/api/')) {
-		// rewrite /api/foo/whatever to api/foo.js->handleAPI()
-		let matches = u.pathname.match(API_REGEX);
-		if (!matches) {
-			return errors.abortRequest(request, response, 500, 'Unrecognized API');
+	try {
+		if (!SAFE_PAGES.includes(u.pathname) && !await auth.isLoggedIn(request)) {
+			// redirect unauthed users to static/login.html
+			response.writeHead(302, {'Location': START_PAGE});
+			response.end();
+		} else if (u.pathname.startsWith('/api/')) {
+			// rewrite /api/foo/whatever to api/foo.js->handleAPI()
+			let matches = u.pathname.match(API_REGEX);
+			if (!matches) {
+				return errors.abortRequest(request, response, 500, 'Unrecognized API');
+			}
+			let api = require(__dirname + '/api/' + matches[1] + '.js');
+			await api.handleAPI(request, response);
+		} else {
+			// otherwise serve static/*.html
+			static.serve(request, response);
 		}
-		let api;
-		try {
-			api = require(__dirname + '/api/' + matches[1] + '.js');
-		}
-		catch (e) {
-			console.log(`Caught exception: ${e} ${e.stack}`);
-			return errors.abortRequest(request, response, 500, 'Unrecognized API');
-		}
-		await api.handleAPI(request, response);
-	} else {
-		// otherwise serve static/*.html
-		static.serve(request, response);
+	}
+	catch (e) {
+		console.log(`Caught exception: ${e} ${e.stack}`);
+		return errors.abortRequest(request, response, 500, 'Server error');
 	}
 };

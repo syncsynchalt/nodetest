@@ -5,6 +5,7 @@ let errors = require(__dirname + '/../service/errors.js');
 let postdata = require(__dirname + '/../service/postdata.js');
 let writejson = require(__dirname + '/../service/writejson.js');
 let params = require(__dirname + '/../service/params.js');
+let fspromise = require(__dirname + '/../service/fspromise.js');
 
 const CONFIGS_DIR = __dirname + '/../data/configs/';
 
@@ -23,16 +24,9 @@ exports.handleAPI = async (request, response) => {
 			}
 			let promises = [];
 			for (let item of items) {
-				let p = new Promise((resolve, reject) => {
-					fs.readFile(CONFIGS_DIR + '/' + item, (err, data) => {
-						if (err) {
-							reject(err);
-						}
-						let obj = JSON.parse(data);
-						resolve(obj);
-					});
-				});
-				promises.push(p);
+				promises.push(
+					fspromise.readFile(CONFIGS_DIR + '/' + item, 'utf8').then(JSON.parse)
+				);
 			}
 			Promise.all(promises).then((objs) => {
 				if (parms.sortKey) {
@@ -67,12 +61,8 @@ exports.handleAPI = async (request, response) => {
 		key = querystring.unescape(key);
 		if (await configExists(key)) {
 			let file = getConfigFilename(key);
-			fs.readFile(file, 'utf8', (err, data) => {
-				if (err) {
-					throw err;
-				}
-				writejson.write({success: true, configuration: JSON.parse(data)}, response);
-			});
+			let data = await fspromise.readFile(file, 'utf8');
+			writejson.write({success: true, configuration: JSON.parse(data)}, response);
 		} else {
 			writejson.write({success: false}, response, 204);
 		}
@@ -88,16 +78,12 @@ exports.handleAPI = async (request, response) => {
 			return errors.abortRequest(request, response, 409, 'Already exists');
 		}
 		let file = getConfigFilename(config.name);
-		fs.writeFile(file, data, 'utf8', (err) => {
-			if (err) {
-				throw err;
-			}
-			writejson.write({
-				success: true,
-				msg: 'created ' + config.name,
-				uri: '/api/configs/' + querystring.escape(config.name)
-			}, response);
-		});
+		await fspromise.writeFile(file, data, 'utf8');
+		writejson.write({
+			success: true,
+			msg: 'created ' + config.name,
+			uri: '/api/configs/' + querystring.escape(config.name)
+		}, response);
 	} else if (request.method === 'PATCH' && u.pathname === '/api/configs/') {
 		// update a config
 		let data = await postdata.get(request);
@@ -105,21 +91,17 @@ exports.handleAPI = async (request, response) => {
 		if (!config.name) {
 			return errors.abortRequest(request, response, 500, 'No name given');
 		}
-		if (await !configExists(config.name)) {
+		if (!await configExists(config.name)) {
 			// known issue: race condition here
 			return errors.abortRequest(request, response, 204, 'Does not exist');
 		}
 		let file = getConfigFilename(config.name);
-		fs.writeFile(file, data, 'utf8', (err) => {
-			if (err) {
-				throw err;
-			}
-			writejson.write({
-				success: true,
-				msg: 'updated ' + config.name,
-				uri: '/api/configs/' + querystring.escape(config.name)
-			}, response);
-		});
+		await fspromise.writeFile(file, data, 'utf8');
+		writejson.write({
+			success: true,
+			msg: 'updated ' + config.name,
+			uri: '/api/configs/' + querystring.escape(config.name)
+		}, response);
 	} else if (request.method === 'DELETE') {
 		// delete a config by name
 		if (!u.pathname.startsWith('/api/configs/')) {
@@ -131,12 +113,8 @@ exports.handleAPI = async (request, response) => {
 
 		if (await configExists(key)) {
 			let file = getConfigFilename(key);
-			fs.unlink(file, err => {
-				if (err) {
-					throw err;
-				}
-				writejson.write({success: true}, response);
-			});
+			await fspromise.unlink(file);
+			writejson.write({success: true}, response);
 		} else {
 			writejson.write({success: false}, response, 204);
 		}
@@ -150,17 +128,16 @@ exports.exists = configExists;
 
 async function configExists(name) {
 	let file = getConfigFilename(name);
-	return new Promise((resolve, reject) => {
-		fs.stat(file, (err) => {
-			if (err && err.code === 'ENOENT') {
-				resolve(false);
-			} else if (err) {
-				reject(err);
+	fspromise.stat(file).then(
+		() => {return true;},
+		(err) => {
+			if (err.code == 'ENOENT') {
+				return true;
 			} else {
-				resolve(true);
+				throw err;
 			}
-		});
-	});
+		}
+	);
 }
 
 function getConfigFilename(name) {
