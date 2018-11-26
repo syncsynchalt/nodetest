@@ -1,28 +1,27 @@
 #!/usr/bin/env node
 
 let fs = require('fs');
-let exec = require('child_process');
+let child_process = require('child_process');
+let util = require('util');
 
-fs.readdir('./tests', function(err, items) {
+fs.readdir('./tests', async (err, items) => {
 	if (err) {
 		throw err;
 	}
 
+	const exec = util.promisify(child_process.exec);
 	for (let item of items) {
 		if (item.startsWith('.')) {
 			continue;
 		}
-		exec.exec('node tests/' + item, (err, stdout, stderr) => {
-			if (stdout) {
-				console.log(stdout);
-			}
-			if (stderr) {
-				console.warn(stderr);
-			}
-			if (err) {
-				throw err;
-			}
-		});
+		console.log(`node tests/${item}`);
+		let result = await exec(`node tests/${item}`);
+		if (result.stdout) {
+			console.log(result.stdout);
+		}
+		if (result.stderr) {
+			console.warn(result.stderr);
+		}
 	}
 	console.log('Success');
 });

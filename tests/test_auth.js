@@ -9,4 +9,7 @@ assert.doesNotReject(async () => {
 	assert.strictEqual(await auth.checkLogin('testuser', null), false);
 	assert.strictEqual(await auth.checkLogin('testuser', ''), false);
 	assert.strictEqual(await auth.checkLogin('testuser', undefined), false);
+}).catch(err => {
+	console.error(`${err}`);
+	require('process').exit(1);
 });

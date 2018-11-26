@@ -128,11 +128,11 @@ exports.exists = configExists;
 
 async function configExists(name) {
 	let file = getConfigFilename(name);
-	fspromise.stat(file).then(
-		() => {return true;},
+	return fspromise.stat(file).then(
+		() => true,
 		(err) => {
 			if (err.code == 'ENOENT') {
-				return true;
+				return false;
 			} else {
 				throw err;
 			}

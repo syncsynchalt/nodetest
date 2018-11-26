@@ -8,4 +8,7 @@ assert.doesNotReject(async () => {
 	data = await fspromise.readFile('/tmp/foo_test.txt', 'utf8');
 	assert.equal(data, 'bing bong\n');
 	await fspromise.unlink('/tmp/foo_test.txt');
+}).catch(err => {
+	console.error(`${err}`);
+	require('process').exit(1);
 });
